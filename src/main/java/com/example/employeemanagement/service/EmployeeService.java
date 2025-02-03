@@ -1,35 +1,60 @@
 package com.example.employeemanagement.service;
 
+import com.example.employeemanagement.dto.EmployeeDTO;
+import com.example.employeemanagement.exception.ResourceNotFoundException;
+import com.example.employeemanagement.model.Department;
 import com.example.employeemanagement.model.Employee;
+import com.example.employeemanagement.repository.DepartmentRepository;
 import com.example.employeemanagement.repository.EmployeeRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
 
-    private static final Logger logger = LoggerFactory.getLogger(EmployeeService.class);
     private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
 
-    public EmployeeService(EmployeeRepository employeeRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository, DepartmentRepository departmentRepository) {
         this.employeeRepository = employeeRepository;
+        this.departmentRepository = departmentRepository;
     }
 
-    public List<Employee> getEmployeesByDepartment(Long departmentId) {
-        logger.info("Fetching employees for department ID: {}", departmentId);
-        return employeeRepository.findByDepartment(departmentId);
+    // Get all employees by department ID
+    public List<EmployeeDTO> getEmployeesByDepartment(Long departmentId) {
+        // Cek apakah department ada
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Department not found with ID: " + departmentId));
+
+        // Jika department ditemukan, cari employee berdasarkan department
+        List<Employee> employees = employeeRepository.findByDepartment(departmentId);
+        return employees.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Employee> getEmployeeById(Long id) {
-        logger.info("Fetching employee by ID: {}", id);
-        return employeeRepository.findById(id);
+    // Get employee by ID
+    public EmployeeDTO getEmployeeById(Long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with ID: " + id));
+        return convertToDTO(employee);
     }
 
-    public Employee createEmployee(Employee employee) {
-        logger.info("Creating employee: {}", employee);
-        return employeeRepository.save(employee);
+    // Create new employee
+    public EmployeeDTO createEmployee(Employee employee) {
+        Employee savedEmployee = employeeRepository.save(employee);
+        return convertToDTO(savedEmployee);
+    }
+
+    // Helper method to convert Employee entity to EmployeeDTO
+    private EmployeeDTO convertToDTO(Employee employee) {
+        return new EmployeeDTO(
+                employee.getId(),
+                employee.getName(),
+                employee.getEmail(),
+                employee.getDepartment().getName() // Assuming the employee has a reference to Department
+        );
     }
 }

@@ -15,7 +15,6 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
     @Query("SELECT e FROM Employee e JOIN FETCH e.department")
     List<Employee> findAllWithDepartments();
 
-    // Menambahkan query untuk mendapatkan semua employee berdasarkan department
     @Query("SELECT e FROM Employee e JOIN FETCH e.department d WHERE d.id = :departmentId")
     List<Employee> findByDepartment(Long departmentId);
 }

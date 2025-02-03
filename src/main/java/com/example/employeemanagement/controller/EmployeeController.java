@@ -1,20 +1,20 @@
 package com.example.employeemanagement.controller;
 
-import com.example.employeemanagement.model.Employee;
+import com.example.employeemanagement.dto.EmployeeDTO;
+import com.example.employeemanagement.exception.ResourceNotFoundException;
 import com.example.employeemanagement.service.EmployeeService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/employees")
+@Tag(name = "Employee Controller", description = "Manage Employee Data")
 public class EmployeeController {
 
-    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
     private final EmployeeService employeeService;
 
     public EmployeeController(EmployeeService employeeService) {
@@ -22,27 +22,19 @@ public class EmployeeController {
     }
 
     @GetMapping("/department/{departmentId}")
-    public ResponseEntity<List<Employee>> getEmployeesByDepartment(@PathVariable Long departmentId) {
-        logger.info("Received request to get employees for department: {}", departmentId);
-        List<Employee> employees = employeeService.getEmployeesByDepartment(departmentId);
-        return ResponseEntity.ok(employees);
+    @Operation(summary = "Get all employees by department")
+    public List<EmployeeDTO> getEmployeesByDepartment(@PathVariable Long departmentId) {
+        return employeeService.getEmployeesByDepartment(departmentId);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
-        logger.info("Received request to get employee by ID: {}", id);
-        Optional<Employee> employee = employeeService.getEmployeeById(id);
-        return employee.map(ResponseEntity::ok)
-                .orElseGet(() -> {
-                    logger.warn("Employee with ID {} not found", id);
-                    return ResponseEntity.notFound().build();
-                });
+    @Operation(summary = "Get employee by ID")
+    public EmployeeDTO getEmployeeById(@PathVariable Long id) {
+        return employeeService.getEmployeeById(id);
     }
 
-    @PostMapping
-    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
-        logger.info("Received request to create employee: {}", employee);
-        Employee savedEmployee = employeeService.createEmployee(employee);
-        return ResponseEntity.ok(savedEmployee);
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleDepartmentNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(404).body(ex.getMessage());
     }
 }
