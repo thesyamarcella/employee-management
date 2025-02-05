@@ -21,6 +21,13 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
+    @PostMapping
+    @Operation(summary = "Create a new employee")
+    public EmployeeDTO createEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        return employeeService.createEmployee(employeeDTO);
+    }
+
+
     @GetMapping("/department/{departmentId}")
     @Operation(summary = "Get all employees by department")
     public List<EmployeeDTO> getEmployeesByDepartment(@PathVariable Long departmentId) {

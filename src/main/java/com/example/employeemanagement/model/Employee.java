@@ -1,6 +1,7 @@
 package com.example.employeemanagement.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,7 +18,7 @@ public class Employee {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnore
     private Department department;
 
     // Constructor

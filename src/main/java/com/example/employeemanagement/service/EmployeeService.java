@@ -43,7 +43,17 @@ public class EmployeeService {
     }
 
     // Create new employee
-    public EmployeeDTO createEmployee(Employee employee) {
+    public EmployeeDTO createEmployee(EmployeeDTO employeeDTO) {
+        Department department = departmentRepository.findByName(employeeDTO.getDepartmentName())
+                .orElseThrow(() -> new ResourceNotFoundException("Department not found: " + employeeDTO.getDepartmentName()));
+
+        // Buat objek Employee
+        Employee employee = new Employee();
+        employee.setName(employeeDTO.getName());
+        employee.setEmail(employeeDTO.getEmail());
+        employee.setDepartment(department);
+
+        // Simpan employee ke database
         Employee savedEmployee = employeeRepository.save(employee);
         return convertToDTO(savedEmployee);
     }

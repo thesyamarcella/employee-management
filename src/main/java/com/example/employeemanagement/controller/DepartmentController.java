@@ -1,10 +1,12 @@
 package com.example.employeemanagement.controller;
 
 import com.example.employeemanagement.dto.DepartmentDTO;
+import com.example.employeemanagement.dto.EmployeeDTO;
 import com.example.employeemanagement.exception.ResourceNotFoundException;
 import com.example.employeemanagement.service.DepartmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,9 +24,9 @@ public class DepartmentController {
     }
 
     @PostMapping
-    @Operation(summary = "Create new department")
+    @Operation(summary = "Create a new department")
     public DepartmentDTO createDepartment(@RequestBody DepartmentDTO departmentDTO) {
-        return departmentService.saveDepartment(departmentDTO);
+        return departmentService.createDepartment(departmentDTO);
     }
 
     @GetMapping

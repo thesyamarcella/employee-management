@@ -17,4 +17,6 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
 
     @Query("SELECT e FROM Employee e JOIN FETCH e.department d WHERE d.id = :departmentId")
     List<Employee> findByDepartment(Long departmentId);
+
+
 }
