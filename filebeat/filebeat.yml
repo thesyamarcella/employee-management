@@ -1,0 +1,11 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /app/logs/app.log
+
+output.kafka:
+  hosts: ["kafka:9092"]
+  topic: "logs-topic"
+  codec.json:
+    pretty: true
